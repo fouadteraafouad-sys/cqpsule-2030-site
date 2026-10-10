@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Time Capsule 2030</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0e1a; --surface:#121a2e; --surface-2:#172040; --line:#232d4d;
+    --text:#f2f5fa; --muted:#8b96b8; --cyan:#3fd6e8; --cyan-dim:#1f5a63;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.6}
+  .wrap{max-width:900px;margin:0 auto;padding:0 24px}
+  header{display:flex;align-items:center;justify-content:space-between;padding:22px 24px;max-width:1000px;margin:0 auto;flex-wrap:wrap;gap:12px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.1rem}
+  .logo .dot{width:30px;height:30px;border-radius:8px;background:var(--surface-2);border:1px solid var(--cyan-dim);display:flex;align-items:center;justify-content:center;color:var(--cyan)}
+  nav{display:flex;gap:26px;color:var(--muted);font-size:0.9rem}
+  nav a{color:inherit;text-decoration:none}
+
+  .hero{text-align:center;padding:50px 0 40px}
+  .pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--cyan-dim);color:var(--cyan);font-size:0.78rem;padding:7px 16px;border-radius:999px;letter-spacing:0.03em}
+  h1{font-weight:800;font-size:clamp(2rem,6vw,3rem);line-height:1.2;margin:22px 0 14px}
+  h1 .accent{color:var(--cyan)}
+  .lede{color:var(--muted);max-width:520px;margin:0 auto 32px;font-size:1rem}
+
+  .countdown{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:32px}
+  .cbox{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 20px;text-align:center;min-width:80px}
+  .cbox .num{font-weight:800;font-size:1.8rem;color:var(--text)}
+  .cbox .lbl{font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-top:2px}
+
+  .btn{display:inline-block;padding:13px 26px;border-radius:8px;font-size:0.95rem;text-decoration:none;font-weight:600;border:1px solid transparent;cursor:pointer;font-family:inherit}
+  .btn-primary{background:var(--cyan);color:#06222a}
+  .btn-ghost{border-color:var(--line);color:var(--text);background:var(--surface)}
+
+  section{padding:46px 0;border-top:1px solid var(--line)}
+  .kicker{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);color:var(--muted);font-size:0.75rem;padding:5px 14px;border-radius:999px;margin-bottom:14px}
+  h2{font-weight:800;font-size:1.6rem;text-align:center}
+  .subtext{color:var(--muted);text-align:center;font-size:0.9rem;margin-top:6px}
+  .center{text-align:center}
+
+  .empty-box{margin:28px auto 0;max-width:620px;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:40px 24px;text-align:center;color:var(--muted)}
+  .empty-box .icon{width:46px;height:46px;border-radius:10px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;color:var(--cyan)}
+
+  .leader{display:flex;justify-content:space-between;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin-top:10px;max-width:620px;margin-left:auto;margin-right:auto}
+
+  footer{padding:30px 0 50px;text-align:center;color:var(--muted);font-size:0.8rem}
+
+  .overlay{position:fixed;inset:0;background:rgba(5,8,16,0.75);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto;z-index:50}
+  .overlay.open{display:flex}
+  .modal{background:var(--bg);border:1px solid var(--line);border-radius:14px;max-width:760px;width:100%;padding:28px}
+  .modal-head{display:flex;justify-content:space-between;align-items:flex-start}
+  .modal h2{text-align:left;font-size:1.5rem}
+  .modal .sub{color:var(--muted);font-size:0.9rem;margin-top:6px}
+  .close{background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer}
+
+  .tiers{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:24px 0}
+  @media(max-width:560px){.tiers{grid-template-columns:1fr}}
+  .tier{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;cursor:pointer}
+  .tier.selected{border-color:var(--cyan);box-shadow:0 0 0 1px var(--cyan)}
+  .tier .name{font-weight:700;font-size:0.95rem}
+  .tier .price{font-weight:800;font-size:1.3rem;margin-top:4px}
+  .tier .price .old{color:var(--muted);text-decoration:line-through;font-size:0.8rem;font-weight:500;margin-left:6px}
+  .tier ul{list-style:none;margin-top:8px;font-size:0.8rem;color:var(--muted)}
+  .tier li{margin-top:4px}
+  .custom-qty{display:none;margin-top:8px}
+  .tier.selected .custom-qty{display:block}
+  .custom-qty input{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px;color:var(--text)}
+
+  .field-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+  @media(max-width:560px){.field-grid{grid-template-columns:1fr}}
+  label{font-size:0.8rem;color:var(--muted);display:block;margin-bottom:6px}
+  input,textarea{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:11px 13px;color:var(--text);font-family:inherit;font-size:0.92rem}
+
+  .total-bar{display:flex;justify-content:space-between;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-top:20px}
+  .total-bar .amt{font-size:1.4rem;font-weight:800}
+
+  .note{color:var(--muted);font-size:0.8rem;margin-top:10px}
+
+  .claim-card{background:var(--surface);border:1px solid var(--cyan-dim);border-radius:14px;padding:30px;max-width:520px;margin:40px auto}
+  .msg{padding:14px;border-radius:8px;margin-top:14px;font-size:0.9rem}
+  .msg.ok{background:#102b25;border:1px solid var(--cyan-dim);color:#aef0e2}
+  .msg.err{background:#2b1418;border:1px solid #5c2630;color:#f0b4bd}
+  .hidden{display:none !important}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="dot">🕐</span> Time Capsule <span style="color:var(--cyan)">2030</span></div>
+  <nav>
+    <a href="#leaderboard">Leaderboard</a>
+    <a href="#capsule-space">Capsule Space</a>
+    <a href="#security">Security</a>
+  </nav>
+  <button class="btn btn-primary" onclick="openModal()">Adopt a Capsule</button>
+</header>
+
+<div id="homepage">
+  <div class="hero wrap">
+    <span class="pill">🔒 Sealed until January 1, 2030</span>
+    <h1>Give your team a message<br>they'll open <span class="accent" style="color:var(--cyan)">in 2030.</span></h1>
+    <p class="lede">Your company adopts sealed capsules and hands them to your people — a short message locked away until the clock strikes 2030.</p>
+    <div class="countdown" id="countdown"></div>
+    <button class="btn btn-primary" onclick="openModal()">Adopt a Capsule</button>
+  </div>
+
+  <section id="leaderboard">
+    <div class="wrap">
+      <div class="center"><span class="kicker">🏆 Corporate Leaderboard</span></div>
+      <h2>Brands racing to 2030</h2>
+      <p class="subtext">Real-time ranked table of corporate capsule adoptions</p>
+      <div id="leader-list"></div>
+    </div>
+  </section>
+
+  <section id="capsule-space">
+    <div class="wrap">
+      <div class="center"><span class="kicker">⭐ Capsule Space</span></div>
+      <h2>The 2030 constellation</h2>
+      <p class="subtext" id="capsule-count">Loading…</p>
+    </div>
+  </section>
+
+  <section id="security">
+    <div class="wrap">
+      <h2>Built to keep your future safe</h2>
+      <p class="subtext">Capsules are locked by our server's clock, not your device's — nobody can open one early.</p>
+    </div>
+  </section>
+</div>
+
+<div id="claimpage" class="wrap hidden">
+  <div class="claim-card">
+    <h2 id="claim-title" style="text-align:left">You got a capsule.</h2>
+    <p class="subtext" id="claim-sub" style="text-align:left;margin-top:8px"></p>
+    <form id="claim-form" style="margin-top:20px">
+      <label>Your message to 2030</label>
+      <textarea rows="5" id="claim-message" placeholder="Write here…" required></textarea>
+      <div style="height:10px"></div>
+      <label>Email (optional — to notify you when it unlocks)</label>
+      <input type="email" id="claim-email" placeholder="you@email.com">
+      <div style="height:16px"></div>
+      <button type="submit" class="btn btn-primary" style="width:100%">Seal my capsule</button>
+    </form>
+    <div id="claim-result"></div>
+  </div>
+</div>
+
+<footer>Time Capsule 2030 — sealed until January 1, 2030 UTC.</footer>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h2>Adopt a Capsule</h2>
+        <div class="sub">Will you claim the top spot and prove your brand?</div>
+      </div>
+      <button class="close" onclick="closeModal()">✕</button>
+    </div>
+
+    <div class="tiers" id="tier-list">
+      <div class="tier" data-tier="starter" data-price="14" data-count="5" data-pts="5" onclick="selectTier(this)">
+        <div class="name">Starter Adoption</div>
+        <div class="price">$14</div>
+        <ul><li>5 capsules adopted</li><li>+5 points on the leaderboard</li></ul>
+      </div>
+      <div class="tier" data-tier="growth" data-price="28" data-count="10" data-pts="10" onclick="selectTier(this)">
+        <div class="name">Growth Adoption</div>
+        <div class="price">$28 <span class="old">$30</span></div>
+        <ul><li>10 capsules adopted</li><li>+10 points on the leaderboard</li></ul>
+      </div>
+      <div class="tier" data-tier="vip" data-price="420" data-count="150" data-pts="160" onclick="selectTier(this)">
+        <div class="name">VIP Adoption</div>
+        <div class="price">$420 <span class="old">$450</span></div>
+        <ul><li>150 capsules adopted</li><li>+160 points bonus</li><li>Recipients can attach a photo + verified email</li></ul>
+      </div>
+      <div class="tier" data-tier="custom" data-price="3" data-count="0" data-pts="0" onclick="selectTier(this)">
+        <div class="name">Custom Adoption</div>
+        <div class="price">$3 <span style="font-size:0.75rem;color:var(--muted)">each</span></div>
+        <ul><li>Minimum 5 capsules</li><li>$3 per capsule</li></ul>
+        <div class="custom-qty"><input type="number" min="5" value="5" id="custom-count" oninput="updateTotal()" placeholder="How many capsules?"></div>
+      </div>
+    </div>
+
+    <div class="field-grid">
+      <div><label>Company name *</label><input type="text" id="co-name" placeholder="Acme Corp"></div>
+      <div><label>Tagline</label><input type="text" id="co-tagline" placeholder="Building the future"></div>
+      <div><label>Website URL (optional)</label><input type="url" id="co-website" placeholder="https://acme.com"></div>
+      <div><label>Company logo</label><input type="file" accept="image/*" disabled></div>
+    </div>
+
+    <div class="total-bar">
+      <div>
+        <div style="font-size:0.8rem;color:var(--muted)" id="total-meta">10 capsules adopted</div>
+        <div style="font-size:0.78rem;color:var(--cyan)">🏆 +10 points</div>
+      </div>
+      <div class="amt">$<span id="total-amt">28.00</span></div>
+    </div>
+
+    <button class="btn btn-primary" style="width:100%;margin-top:16px;opacity:0.6" disabled>Checkout with Paddle — connecting soon</button>
+    <p class="note">Payment isn't wired up yet — this is the exact flow that will go live once Paddle is connected.</p>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://nrsdgldtgmqjncnvddnt.supabase.co";
+const SUPABASE_KEY = "sb_publishable_zJhllkL25nV_wImMRgjPPQ_YJoNItB_";
+
+function updateCountdown(){
+  const target = new Date("2030-01-01T00:00:00Z").getTime();
+  const diff = Math.max(0, target - Date.now());
+  const d = Math.floor(diff/86400000), h=Math.floor((diff%86400000)/3600000), m=Math.floor((diff%3600000)/60000), s=Math.floor((diff%60000)/1000);
+  document.getElementById('countdown').innerHTML = [[d,'Days'],[h,'Hours'],[m,'Min'],[s,'Sec']]
+    .map(([v,l])=>`<div class="cbox"><div class="num">${v}</div><div class="lbl">${l}</div></div>`).join('');
+}
+setInterval(updateCountdown,1000); updateCountdown();
+
+function openModal(){ document.getElementById('overlay').classList.add('open'); 
+  document.querySelector('.tier[data-tier="growth"]').click();
+}
+function closeModal(){ document.getElementById('overlay').classList.remove('open'); }
+
+function selectTier(el){
+  document.querySelectorAll('.tier').forEach(t=>t.classList.remove('selected'));
+  el.classList.add('selected');
+  updateTotal();
+}
+function updateTotal(){
+  const sel = document.querySelector('.tier.selected');
+  if(!sel) return;
+  let price = parseFloat(sel.dataset.price), count = parseInt(sel.dataset.count), pts = parseInt(sel.dataset.pts);
+  if(sel.dataset.tier === 'custom'){
+    const qty = Math.max(5, parseInt(document.getElementById('custom-count').value || 5));
+    count = qty; pts = qty; price = qty * 3;
+  }
+  document.getElementById('total-amt').textContent = price.toFixed(2);
+  document.getElementById('total-meta').textContent = `${count} capsules adopted`;
+}
+
+async function loadLeaderboard(){
+  try{
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/public_leaderboard?select=name,points&order=points.desc&limit=10`,{
+      headers:{ apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+    });
+    const data = await res.json();
+    const el = document.getElementById('leader-list');
+    if(!data.length){
+      el.innerHTML = '<div class="empty-box"><div class="icon">🏢</div>No corporate sponsors yet. Be the first to adopt and claim the top spot.</div>';
+    } else {
+      el.innerHTML = data.map(c=>`<div class="leader"><span>${c.name}</span><span>${c.points} pts</span></div>`).join('');
+    }
+  }catch(e){
+    document.getElementById('leader-list').innerHTML = '<div class="empty-box">Couldn\'t load the leaderboard right now.</div>';
+  }
+}
+async function loadCapsuleCount(){
+  try{
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/public_leaderboard?select=credits_used`,{
+      headers:{ apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+    });
+    const data = await res.json();
+    const total = data.reduce((sum,c)=>sum+(c.credits_used||0),0);
+    document.getElementById('capsule-count').textContent = `${total} locked capsules orbiting until the unlock date`;
+  }catch(e){
+    document.getElementById('capsule-count').textContent = '0 locked capsules orbiting until the unlock date';
+  }
+}
+
+const params = new URLSearchParams(window.location.search);
+const co = params.get('co');
+
+if(co){
+  document.getElementById('homepage').classList.add('hidden');
+  document.getElementById('claimpage').classList.remove('hidden');
+  (async ()=>{
+    try{
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/public_leaderboard?slug=eq.${encodeURIComponent(co)}&select=name,tagline`,{
+        headers:{ apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+      });
+      const data = await res.json();
+      if(data.length){
+        document.getElementById('claim-title').textContent = `You got a capsule from ${data[0].name}.`;
+        document.getElementById('claim-sub').textContent = data[0].tagline || 'Write a message to your future self, sealed until 2030.';
+      } else {
+        document.getElementById('claim-title').textContent = "This link isn't active.";
+        document.getElementById('claim-form').classList.add('hidden');
+      }
+    }catch(e){}
+  })();
+  document.getElementById('claim-form').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const message = document.getElementById('claim-message').value;
+    const email = document.getElementById('claim-email').value;
+    const resultEl = document.getElementById('claim-result');
+    resultEl.innerHTML = '';
+    try{
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/claim-capsule`,{
+        method:'POST',
+        headers:{ 'Content-Type':'application/json', apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
+        body: JSON.stringify({ slug: co, message, email: email || null })
+      });
+      const data = await res.json();
+      if(res.ok && data.success){
+        document.getElementById('claim-form').classList.add('hidden');
+        resultEl.innerHTML = '<div class="msg ok">Sealed. Your capsule is locked until January 1, 2030.</div>';
+      } else {
+        resultEl.innerHTML = `<div class="msg err">${data.error || 'Something went wrong.'}</div>`;
+      }
+    }catch(err){
+      resultEl.innerHTML = '<div class="msg err">Network error — please try again.</div>';
+    }
+  });
+} else {
+  loadLeaderboard();
+  loadCapsuleCount();
+}
+</script>
+</body>
+</html>
